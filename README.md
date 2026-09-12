@@ -21,7 +21,7 @@ The development server runs on port 3000 by default. To validate the production 
 
 ## Assignment handoff
 
-The website includes the homepage, story, menu, atmosphere, gallery, two-location finder, and contact sections requested in the brief. The menu items and prices were transcribed from the owner-supplied menu photographs. The owner confirmed permission to use the business name, information, and supplied images. The confirmed contact number is **+91 88513 72876**. The two displayed locations are Godavari Complex in Sector 37 and Shop no 17, Golf Avenue, behind Spectrum Mall in Sector 75, Noida.
+The website includes the homepage, story, verified menu, image-led counter section, owner-supplied gallery, two-location finder, and contact sections requested in the brief. The menu items and prices were transcribed from the owner-supplied menu photographs. The owner confirmed permission to use the business name, information, and supplied images. The confirmed contact number is **+91 88513 72876**. The two displayed locations are Godavari Complex in Sector 37 and Shop no 17, Golf Avenue, behind Spectrum Mall in Sector 75, Noida.
 
 The accompanying summary document is available at [`TeaYoung-Website-Summary.pdf`](TeaYoung-Website-Summary.pdf). Visual QA notes are recorded in [`QA_NOTES.md`](QA_NOTES.md).
 
