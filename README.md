@@ -1,6 +1,6 @@
 # TeaYoung Boba Café
 
-A responsive concept website for **TeaYoung Boba Tea** in Sector 37, Noida. The experience is designed as a warm digital front door for a neighbourhood café: it introduces the brand, highlights representative drinks and bites, communicates the in-store atmosphere, makes the location easy to find, and gives visitors a simple inquiry path.
+A responsive website for **TeaYoung Boba Tea** and its two Noida locations. The experience is designed as a warm digital front door for a neighbourhood café: it introduces the brand, presents verified drinks and Korean ramyun items, showcases owner-approved photography, makes both locations easy to find, and gives visitors direct phone and WhatsApp contact options.
 
 ## Design direction
 
@@ -21,9 +21,9 @@ The development server runs on port 3000 by default. To validate the production 
 
 ## Assignment handoff
 
-The website includes the homepage, story, menu, atmosphere, location, and contact sections requested in the brief. The menu uses representative placeholder items and prices, and the footer explicitly notes that owner confirmation is still required. Before public or commercial use, confirm the business owner's permission, approved copy, current menu, hours, phone number, email address, and image rights.
+The website includes the homepage, story, menu, atmosphere, gallery, two-location finder, and contact sections requested in the brief. The menu items and prices were transcribed from the owner-supplied menu photographs. The owner confirmed permission to use the business name, information, and supplied images. The confirmed contact number is **+91 88513 72876**. The two displayed locations are Godavari Complex in Sector 37 and Shop no 17, Golf Avenue, behind Spectrum Mall in Sector 75, Noida.
 
-The accompanying summary document is available at [`docs/TeaYoung-Website-Summary.pdf`](docs/TeaYoung-Website-Summary.pdf). Visual QA notes are recorded in [`QA_NOTES.md`](QA_NOTES.md).
+The accompanying summary document is available at [`TeaYoung-Website-Summary.pdf`](TeaYoung-Website-Summary.pdf). Visual QA notes are recorded in [`QA_NOTES.md`](QA_NOTES.md).
 
 ## Reference links
 
