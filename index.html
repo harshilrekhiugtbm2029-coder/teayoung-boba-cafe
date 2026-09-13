@@ -13,14 +13,63 @@
   const projectPath = location.pathname.replace(/\/+$/,'') || '/';
   const appUrl = projectPath === '/' ? './app.html' : projectPath + '/app.html';
   try {
-    // Fetch the real app while we are still on the GitHub Pages project path.
     const res = await fetch(appUrl,{cache:'no-store'});
     if(!res.ok) throw new Error('Unable to load app shell: '+res.status);
     let html = await res.text();
-    // The existing compiled app expects the domain root. Let it boot at /,
-    // then restore the GitHub Pages URL without firing a popstate event.
     history.replaceState(null,'','/');
-    const injected = `\n<style id="ty-pages-fixes">\n  @keyframes tyTickerLoop { from { transform: translate3d(0,0,0); } to { transform: translate3d(-25%,0,0); } }\n  .ty-infinite-ticker { animation: tyTickerLoop 28s linear infinite !important; will-change: transform; }\n  .ty-infinite-ticker > * { flex: 0 0 auto !important; }\n</style>\n<script>\n(() => {\n  const targetPath = ${JSON.stringify(originalPath || projectPath + '/')};\n  function fixTicker(){\n    const all = [...document.querySelectorAll('*')];\n    const candidates = all.filter(el => {\n      const text = (el.textContent || '').replace(/\\s+/g,' ').trim();\n      return text.includes('HAND-SHAKEN') && text.includes('GOOD ENERGY ONLY') && el.children.length >= 2 && text.length < 2500;\n    });\n    const ticker = candidates.sort((a,b) => a.textContent.length - b.textContent.length)[0];\n    if(!ticker || ticker.dataset.tyInfiniteFixed) return;\n    const viewport = ticker.parentElement || ticker;\n    viewport.style.overflow = 'hidden';\n    viewport.style.width = '100%';\n    ticker.dataset.tyInfiniteFixed = '1';\n    const original = ticker.innerHTML;\n    ticker.innerHTML = original + original + original + original;\n    ticker.classList.add('ty-infinite-ticker');\n    ticker.style.display = 'flex';\n    ticker.style.flexWrap = 'nowrap';\n    ticker.style.width = 'max-content';\n    ticker.style.minWidth = 'max-content';\n    ticker.style.justifyContent = 'flex-start';\n    ticker.style.alignItems = 'center';\n    ticker.style.gap = '0';\n  }\n  const run = () => { fixTicker(); };\n  if(document.readyState === 'loading') document.addEventListener('DOMContentLoaded',run,{once:true}); else run();\n  new MutationObserver(run).observe(document.documentElement,{subtree:true,childList:true});\n  setInterval(run,1000);\n  setTimeout(() => history.replaceState(null,'',targetPath),1200);\n})();\n<\\/script>\n`;
+    const injected = `
+<style id="ty-pages-fixes">
+  @keyframes tyTickerLoop { from { transform: translate3d(0,0,0); } to { transform: translate3d(-25%,0,0); } }
+  .ty-infinite-viewport { overflow:hidden !important; width:100% !important; }
+  .ty-infinite-track { display:flex !important; flex-wrap:nowrap !important; width:max-content !important; min-width:max-content !important; justify-content:flex-start !important; align-items:center !important; gap:0 !important; animation:tyTickerLoop 28s linear infinite !important; will-change:transform; }
+  .ty-infinite-copy { display:flex !important; flex:0 0 auto !important; flex-wrap:nowrap !important; width:max-content !important; min-width:max-content !important; justify-content:flex-start !important; align-items:center !important; gap:0 !important; }
+  .ty-infinite-copy > * { flex:0 0 auto !important; }
+</style>
+<script>
+(() => {
+  const targetPath = ${JSON.stringify(originalPath || projectPath + '/')};
+  function fixTicker(){
+    const all = [...document.querySelectorAll('*')];
+    const candidates = all.filter(el => {
+      const text = (el.textContent || '').replace(/\\s+/g,' ').trim();
+      return text.includes('HAND-SHAKEN') && text.includes('GOOD ENERGY ONLY') && el.children.length >= 2 && text.length < 2500;
+    });
+    const ticker = candidates.sort((a,b) => a.textContent.length - b.textContent.length)[0];
+    if(!ticker) return;
+    if(ticker.dataset.tyInfiniteFixed === '1') return;
+
+    const viewport = ticker.parentElement || ticker;
+    viewport.classList.add('ty-infinite-viewport');
+    ticker.dataset.tyInfiniteFixed = '1';
+
+    const original = ticker.innerHTML;
+    const track = document.createElement('div');
+    track.className = 'ty-infinite-track';
+
+    for(let i=0;i<4;i++){
+      const copy = document.createElement('div');
+      copy.className = 'ty-infinite-copy';
+      copy.innerHTML = original;
+      track.appendChild(copy);
+    }
+
+    ticker.innerHTML = '';
+    ticker.appendChild(track);
+    ticker.style.display = 'block';
+    ticker.style.width = 'max-content';
+    ticker.style.minWidth = 'max-content';
+    ticker.style.padding = '0';
+    ticker.style.margin = '0';
+    ticker.style.overflow = 'visible';
+  }
+  const run = () => { fixTicker(); };
+  if(document.readyState === 'loading') document.addEventListener('DOMContentLoaded',run,{once:true}); else run();
+  new MutationObserver(run).observe(document.documentElement,{subtree:true,childList:true});
+  setInterval(run,1000);
+  setTimeout(() => history.replaceState(null,'',targetPath),1200);
+})();
+</script>
+`;
     if(html.includes('</body>')) html = html.replace('</body>', injected + '</body>');
     else html += injected;
     document.open();
