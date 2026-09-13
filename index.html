@@ -4,81 +4,69 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>TeaYoung Boba Café</title>
-<style>html,body{margin:0;min-height:100%;background:#fbf8f1}</style>
+<style>
+html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#fbf8f1}
+#ty-app{display:block;width:100vw;height:100vh;border:0}
+</style>
 </head>
 <body>
+<iframe id="ty-app" src="app.html" title="TeaYoung Boba Café" loading="eager"></iframe>
 <script>
-(async()=>{
-  const originalPath = location.pathname + location.search + location.hash;
-  const projectPath = location.pathname.replace(/\/+$/,'') || '/';
-  const appUrl = projectPath === '/' ? './app.html' : projectPath + '/app.html';
-  try {
-    const res = await fetch(appUrl,{cache:'no-store'});
-    if(!res.ok) throw new Error('Unable to load app shell: '+res.status);
-    let html = await res.text();
-    history.replaceState(null,'','/');
-    const injected = `
-<style id="ty-pages-fixes">
-  @keyframes tyTickerLoop { from { transform: translate3d(0,0,0); } to { transform: translate3d(-25%,0,0); } }
-  .ty-infinite-viewport { overflow:hidden !important; width:100% !important; }
-  .ty-infinite-track { display:flex !important; flex-wrap:nowrap !important; width:max-content !important; min-width:max-content !important; justify-content:flex-start !important; align-items:center !important; gap:0 !important; animation:tyTickerLoop 28s linear infinite !important; will-change:transform; }
-  .ty-infinite-copy { display:flex !important; flex:0 0 auto !important; flex-wrap:nowrap !important; width:max-content !important; min-width:max-content !important; justify-content:flex-start !important; align-items:center !important; gap:0 !important; }
-  .ty-infinite-copy > * { flex:0 0 auto !important; }
-</style>
-<script>
-(() => {
-  const targetPath = ${JSON.stringify(originalPath || projectPath + '/')};
-  function fixTicker(){
-    const all = [...document.querySelectorAll('*')];
-    const candidates = all.filter(el => {
-      const text = (el.textContent || '').replace(/\\s+/g,' ').trim();
-      return text.includes('HAND-SHAKEN') && text.includes('GOOD ENERGY ONLY') && el.children.length >= 2 && text.length < 2500;
-    });
-    const ticker = candidates.sort((a,b) => a.textContent.length - b.textContent.length)[0];
-    if(!ticker) return;
-    if(ticker.dataset.tyInfiniteFixed === '1') return;
+(function(){
+  const frame=document.getElementById('ty-app');
+  frame.addEventListener('load',function(){
+    try{
+      const doc=frame.contentDocument;
+      if(!doc) return;
+      const style=doc.createElement('style');
+      style.textContent='\n'
+        +'.ty-infinite-viewport{overflow:hidden!important;width:100%!important;}\n'
+        +'.ty-infinite-track{display:flex!important;flex-wrap:nowrap!important;width:max-content!important;min-width:max-content!important;gap:0!important;animation:tyTickerLoop 28s linear infinite!important;will-change:transform!important;}\n'
+        +'.ty-infinite-copy{display:flex!important;flex:0 0 auto!important;flex-wrap:nowrap!important;width:max-content!important;min-width:max-content!important;gap:0!important;}\n'
+        +'.ty-infinite-copy>*{flex:0 0 auto!important;}\n'
+        +'@keyframes tyTickerLoop{from{transform:translate3d(0,0,0)}to{transform:translate3d(-25%,0,0)}}\n';
+      doc.head.appendChild(style);
 
-    const viewport = ticker.parentElement || ticker;
-    viewport.classList.add('ty-infinite-viewport');
-    ticker.dataset.tyInfiniteFixed = '1';
+      function fixTicker(){
+        const candidates=[...doc.querySelectorAll('*')].filter(function(el){
+          const text=(el.textContent||'').replace(/\s+/g,' ').trim();
+          return text.includes('HAND-SHAKEN')&&text.includes('GOOD ENERGY ONLY')&&el.children.length>=2&&text.length<2500;
+        });
+        const ticker=candidates.sort(function(a,b){return a.textContent.length-b.textContent.length})[0];
+        if(!ticker||ticker.dataset.tyInfiniteFixed==='1') return;
 
-    const original = ticker.innerHTML;
-    const track = document.createElement('div');
-    track.className = 'ty-infinite-track';
+        const viewport=ticker.parentElement||ticker;
+        viewport.classList.add('ty-infinite-viewport');
+        ticker.dataset.tyInfiniteFixed='1';
 
-    for(let i=0;i<4;i++){
-      const copy = document.createElement('div');
-      copy.className = 'ty-infinite-copy';
-      copy.innerHTML = original;
-      track.appendChild(copy);
-    }
+        const original=ticker.innerHTML;
+        const track=doc.createElement('div');
+        track.className='ty-infinite-track';
+        for(let i=0;i<4;i++){
+          const copy=doc.createElement('div');
+          copy.className='ty-infinite-copy';
+          copy.innerHTML=original;
+          track.appendChild(copy);
+        }
+        ticker.innerHTML='';
+        ticker.appendChild(track);
+        ticker.style.display='block';
+        ticker.style.width='max-content';
+        ticker.style.minWidth='max-content';
+        ticker.style.padding='0';
+        ticker.style.margin='0';
+        ticker.style.overflow='visible';
+      }
 
-    ticker.innerHTML = '';
-    ticker.appendChild(track);
-    ticker.style.display = 'block';
-    ticker.style.width = 'max-content';
-    ticker.style.minWidth = 'max-content';
-    ticker.style.padding = '0';
-    ticker.style.margin = '0';
-    ticker.style.overflow = 'visible';
-  }
-  const run = () => { fixTicker(); };
-  if(document.readyState === 'loading') document.addEventListener('DOMContentLoaded',run,{once:true}); else run();
-  new MutationObserver(run).observe(document.documentElement,{subtree:true,childList:true});
-  setInterval(run,1000);
-  setTimeout(() => history.replaceState(null,'',targetPath),1200);
-})();
-</script>
-`;
-    if(html.includes('</body>')) html = html.replace('</body>', injected + '</body>');
-    else html += injected;
-    document.open();
-    document.write(html);
-    document.close();
-  } catch(err) {
-    document.body.innerHTML = '<div style="font-family:system-ui;padding:40px">Unable to load TeaYoung right now.</div>';
-    console.error(err);
-  }
+      fixTicker();
+      let tries=0;
+      const timer=setInterval(function(){
+        fixTicker();
+        if(++tries>=20) clearInterval(timer);
+      },300);
+      new MutationObserver(fixTicker).observe(doc.documentElement,{subtree:true,childList:true});
+    }catch(e){console.error('TeaYoung frame fix failed',e)}
+  });
 })();
 </script>
 </body>
